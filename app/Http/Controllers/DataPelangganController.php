@@ -33,12 +33,14 @@ class DataPelangganController extends Controller
         $data_pelanggan->update($request->all());
         return redirect()->route('data_pelanggan.index');
     }
+
     public function destroy($id)
     {
         $data_pelanggan = DataPelanggan::find($id);
         $data_pelanggan->delete();
         return redirect()->route('data_pelanggan.index');
     }
+
     public function show($id)
     {
         $data_pelanggan = DataPelanggan::with('pinjamBotol')

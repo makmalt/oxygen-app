@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('detail_transaksi_isi_botol', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('transaksi_id')->nullable();
-            $table->date('botol_id');
+            $table->unsignedBigInteger('transaksi_id')->nullable();
+            $table->unsignedBigInteger('botol_id');
             $table->boolean('status_kirim')->nullable()->default(0);
             $table->timestamps();
         });

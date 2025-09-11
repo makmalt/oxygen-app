@@ -36,8 +36,27 @@
                 <div data-i18n="Analytics">Data Pinjaman</div>
             </a>
         </li>
-        
+        <li class="menu-item {{ request()->routeIs('data_supplier.*') ? 'active' : '' }}">
+            <a href="{{ route('data_supplier.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-car"></i>
+                <div data-i18n="Analytics">Data Supplier</div>
+            </a>
+        </li>
+
         <!-- Components -->
+        <li class="menu-header small text-uppercase"><span class="menu-header-text">Botol</span></li>
+        <li class="menu-item {{ request()->routeIs('transaksi_isi_botol.create') ? 'active' : '' }}">
+            <a href="{{ route('transaksi_isi_botol.create') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-transfer"></i>
+                <div data-i18n="Analytics">Transaksi Isi Botol</div>
+            </a>
+        </li>
+        <li class="menu-item {{ request()->routeIs('transaksi_isi_botol.index') ? 'active' : '' }}">
+            <a href="{{ route('transaksi_isi_botol.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-list-ul"></i>
+                <div data-i18n="Analytics">Crosscheck Isi Botol</div>
+            </a>
+        </li>
         <li class="menu-header small text-uppercase"><span class="menu-header-text">Lainnya</span></li>
         <li class="menu-item {{ request()->routeIs('data_pinjaman.create') ? 'active' : '' }}">
             <a href="{{ route('data_pinjaman.create') }}" class="menu-link">

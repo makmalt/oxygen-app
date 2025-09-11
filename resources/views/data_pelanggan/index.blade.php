@@ -41,10 +41,15 @@
                                                 class="btn btn-info btn-sm">
                                                 <i class="bx bx-detail me-1"></i> Detail
                                             </a>
-                                            <a href="{{ route('data_pelanggan.destroy', $data_pelanggan->id) }}"
-                                                class="btn btn-danger btn-sm">
-                                                <i class="bx bx-detail me-1"></i> Hapus
-                                            </a>
+                                            <form action="{{ route('data_pelanggan.destroy', $data_pelanggan->id) }}"
+                                                method="POST" style="display:inline-block"
+                                                onsubmit="return confirm('Hapus pelanggan ini?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                    <i class="bx bx-trash me-1"></i> Hapus
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                 @empty
