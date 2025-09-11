@@ -1,0 +1,70 @@
+@extends('layouts.app')
+
+@section('title', 'POS Karya Hutama Oxygen - Edit Botol')
+@section('content')
+    <div class="content-wrapper">
+        <div class="container-xxl flex-grow-1 container-p-y">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-3">
+                    <li class="breadcrumb-item"><a href="#">Botol</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('data_botol.index') }}">Daftar Botol</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Edit Botol</li>
+                </ol>
+            </nav>
+            <div class="d-flex justify-content-between mb-3">
+                <h5 class="mb-0">Edit Botol</h5>
+            </div>
+            <div class="card">
+                <div class="card-header"></div>
+                <div class="card-body">
+                    <form action="{{ route('data_botol.update', $data_botol->id) }}" method="POST"
+                        enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT')
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label for="nomor_botol" class="form-label">Nomor Botol<span
+                                            style="color: red;">*</span></label>
+                                    <input type="text" class="form-control @error('nomor_botol') is-invalid @enderror"
+                                        id="nomor_botol" name="nomor_botol"
+                                        value="{{ old('nomor_botol', $data_botol->nomor_botol) }}" required>
+                                    @error('nomor_botol')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="mb-3">
+                                    <label for="jenis_botol" class="form-label">Jenis Botol<span
+                                            style="color: red;">*</span></label>
+                                    <select class="form-control @error('jenis_botol') is-invalid @enderror" id="jenis_botol"
+                                        name="jenis_botol" required>
+                                        <option value="">Pilih Jenis Botol</option>
+                                        <option value="acitilin"
+                                            {{ old('jenis_botol', $data_botol->jenis_botol) == 'acitilin' ? 'selected' : '' }}>
+                                            Acitilin
+                                        </option>
+                                        <option value="oxygen 1m³"
+                                            {{ old('jenis_botol', $data_botol->jenis_botol) == 'oxygen 1m³' ? 'selected' : '' }}>
+                                            oxygen 1m³
+                                        </option>
+                                        <option value="oxygen 6"
+                                            {{ old('jenis_botol', $data_botol->jenis_botol) == 'oxygen 6' ? 'selected' : '' }}>
+                                            oxygen 6
+                                        </option>
+                                    </select>
+                                    @error('jenis_botol')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <a href="{{ route('data_botol.index') }}" class="btn btn-secondary">Batal</a>
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
