@@ -30,6 +30,17 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
+                                <div>
+                                    <div class="mb-3">
+                                        <label for="uniq" class="form-label">Kode<span
+                                                style="color: red;">*</span></label>
+                                        <input type="text" class="form-control @error('uniq') is-invalid @enderror"
+                                            id="uniq" name="uniq" value="{{ old('uniq') }}" required>
+                                        @error('nomor_botol')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
                                 <div class="mb-3">
                                     <label for="jenis_botol" class="form-label">Jenis Botol<span
                                             style="color: red;">*</span></label>

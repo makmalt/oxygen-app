@@ -68,7 +68,9 @@ class DataPinjamanController extends Controller
             $statusHtml = is_null($row->tanggal_pengembalian)
                 ? '<span class="badge bg-warning text-black">Dipinjam</span>'
                 : '<span class="badge bg-success">Sudah Kembali</span>';
-            $aksi = '<button type="button" class="btn btn-secondary btn-sm" data-action="open-update-status" data-id="' . $row->id . '"><i class="bx bx-refresh"></i> Perbarui</button>';
+            $detailUrl = route('data_pinjaman.show', $row->id);
+            $aksi = '<a href="' . e($detailUrl) . '" class="btn btn-info btn-sm me-1"><i class="bx bx-search"></i> Detail</a>'
+                . '<button type="button" class="btn btn-secondary btn-sm" data-action="open-update-status" data-id="' . $row->id . '"><i class="bx bx-refresh"></i> Perbarui</button>';
             return [
                 '',
                 e($botol),
@@ -163,7 +165,7 @@ class DataPinjamanController extends Controller
     }
     public function show($id)
     {
-        $data_pinjaman = DataPinjaman::find($id);
+        $data_pinjaman = DataPinjaman::with(['botol', 'pelanggan', 'penanggungJawab'])->findOrFail($id);
         return view('data_pinjaman.show', compact('data_pinjaman'));
     }
 

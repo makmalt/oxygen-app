@@ -33,6 +33,7 @@
                                 <tr>
                                     <th>No</th>
                                     <th>Nomor Botol</th>
+                                    <th>Kode</th>
                                     <th>Status Pinjaman</th>
                                     <th>Jenis Botol</th>
                                     <th>Aksi</th>
@@ -43,6 +44,7 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $data_botol->nomor_botol }}</td>
+                                        <td>{{ $data_botol->uniq }}</td>
                                         <td>
                                             @if ($data_botol->status_pinjaman == 0)
                                                 <span class="badge bg-success">Sudah Kembali</span>

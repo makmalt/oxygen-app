@@ -8,15 +8,13 @@ use App\Http\Controllers\RiwayatPinjamanController;
 use App\Http\Controllers\JenisBotolController;
 use App\Http\Controllers\TransaksiIsiBotolController;
 use App\Http\Controllers\DataSupplierController;
-use App\Models\DataBotol;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return redirect('/dashboard');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 Route::resource('data_botol', DataBotolController::class);
 Route::resource('data_pelanggan', DataPelangganController::class);
