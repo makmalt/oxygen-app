@@ -9,6 +9,7 @@ use App\Http\Controllers\JenisBotolController;
 use App\Http\Controllers\TransaksiIsiBotolController;
 use App\Http\Controllers\DataSupplierController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PenanggungJawabController;
 
 Route::get('/', function () {
     return redirect('/dashboard');
@@ -37,6 +38,10 @@ Route::get('/data_pinjaman/pelanggan-by-botol/{botolId}', [DataPinjamanControlle
 Route::get('/jenis_botol', [JenisBotolController::class, 'index'])->name('jenis_botol.index');
 Route::post('/jenis_botol', [JenisBotolController::class, 'store'])->name('jenis_botol.store');
 
+// Penanggung Jawab API (minimal JSON for modal)
+Route::get('/penanggung_jawab', [PenanggungJawabController::class, 'index'])->name('penanggung_jawab.index');
+Route::post('/penanggung_jawab', [PenanggungJawabController::class, 'store'])->name('penanggung_jawab.store');
+
 // Transaksi isi botol
 Route::get('/transaksi-isi-botol', [TransaksiIsiBotolController::class, 'index'])->name('transaksi_isi_botol.index');
 Route::get('/transaksi-isi-botol/data', [TransaksiIsiBotolController::class, 'data'])->name('transaksi_isi_botol.data');
@@ -44,6 +49,7 @@ Route::get('/transaksi-isi-botol/create', [TransaksiIsiBotolController::class, '
 Route::post('/transaksi-isi-botol', [TransaksiIsiBotolController::class, 'store'])->name('transaksi_isi_botol.store');
 Route::get('/transaksi-isi-botol/crosscheck/{id}', [TransaksiIsiBotolController::class, 'crosscheck'])->name('transaksi_isi_botol.crosscheck');
 Route::post('/transaksi-isi-botol/crosscheck/{id}', [TransaksiIsiBotolController::class, 'crosscheckStore'])->name('transaksi_isi_botol.crosscheck.store');
+Route::get('/transaksi-isi-botol/botols', [TransaksiIsiBotolController::class, 'botols'])->name('transaksi_isi_botol.botols');
 
 // Supplier
 Route::resource('data_supplier', DataSupplierController::class)->only(['index', 'create', 'store']);

@@ -48,7 +48,11 @@
                                     @forelse($riwayat as $riwayat)
                                         <tr>
                                             <td>{{ $riwayat->tanggal_pinjaman->format('d F Y') }}</td>
+                                            @if(is_null($riwayat->pelanggan))
+                                                <td class="text-danger">Pelanggan telah dihapus</td>
+                                            @else
                                             <td>{{ $riwayat->pelanggan->nama }}</td>
+                                            @endif
                                             <td>
                                                 @if (is_null($riwayat->tanggal_pengembalian))
                                                     <span

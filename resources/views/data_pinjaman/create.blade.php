@@ -85,14 +85,20 @@
                                 </div>
                                 <div class="mb-3">
                                     <label for="penanggung_jawab_id" class="form-label">Penanggung Jawab</label>
-                                    <select class="form-select select2" name="penanggung_jawab_id" id="penanggung_jawab_id"
-                                        data-placeholder="Penanggung Jawab">
-                                        <option value=""></option>
-                                        @foreach ($penanggung_jawabs as $penanggung_jawab)
-                                            <option value="{{ $penanggung_jawab->id }}">
-                                                {{ $penanggung_jawab->nama }}</option>
-                                        @endforeach
-                                    </select>
+                                    <div class="d-flex gap-2">
+                                        <select class="form-select select2" name="penanggung_jawab_id"
+                                            id="penanggung_jawab_id" data-placeholder="Penanggung Jawab">
+                                            <option value=""></option>
+                                            @foreach ($penanggung_jawabs as $penanggung_jawab)
+                                                <option value="{{ $penanggung_jawab->id }}">
+                                                    {{ $penanggung_jawab->nama }}</option>
+                                            @endforeach
+                                        </select>
+                                        <button type="button" class="btn btn-outline-secondary"
+                                            title="Tambah Penanggung Jawab" data-bs-toggle="modal"
+                                            data-bs-target="#modalPenanggungJawab">+
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-12">
@@ -100,6 +106,31 @@
                             </div>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Penanggung Jawab -->
+    <div class="modal fade" id="modalPenanggungJawab" tabindex="-1" aria-labelledby="modalPenanggungJawabLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalPenanggungJawabLabel">Tambah Penanggung Jawab</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nama" class="form-label">Nama Penanggung Jawab<span
+                                style="color: red;">*</span></label>
+                        <input type="text" id="nama" class="form-control" placeholder="cth: Budi">
+                        <div class="invalid-feedback" id="nama_error" style="display:none;"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-primary" id="btnSimpanPenanggungJawab">Simpan Penanggung
+                        Jawab</button>
                 </div>
             </div>
         </div>
@@ -199,5 +230,91 @@
                 }
             });
         });
+
+        (function() {
+            const penanggungJawabSelect = document.getElementById('penanggung_jawab_id');
+            const inputNama = document.getElementById('nama');
+            const errorNama = document.getElementById('nama_error');
+            const btnSimpanPenanggungJawab = document.getElementById('btnSimpanPenanggungJawab');
+
+            function refreshPenanggungJawabOptions(selectedId) {
+                fetch("{{ route('penanggung_jawab.index') }}", {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        // rebuild options
+                        const current = penanggungJawabSelect.value;
+                        penanggungJawabSelect.innerHTML = '';
+                        const optDefault = document.createElement('option');
+                        optDefault.value = '';
+                        optDefault.textContent = 'Pilih Penanggung Jawab';
+                        penanggungJawabSelect.appendChild(optDefault);
+                        data.forEach(item => {
+                            const opt = document.createElement('option');
+                            opt.value = item.id;
+                            opt.textContent = item.nama;
+                            penanggungJawabSelect.appendChild(opt);
+                        });
+                        const toSelect = selectedId || current;
+                        if (toSelect) {
+                            penanggungJawabSelect.value = toSelect;
+                        }
+                    })
+                    .catch(() => {});
+            }
+
+            btnSimpanPenanggungJawab?.addEventListener('click', function() {
+                const nama = (inputNama?.value || '').trim();
+                errorNama.style.display = 'none';
+                errorNama.textContent = '';
+                inputNama.classList.remove('is-invalid');
+                if (!nama) {
+                    inputNama.classList.add('is-invalid');
+                    errorNama.textContent = 'Nama penanggung jawab wajib diisi';
+                    errorNama.style.display = 'block';
+                    return;
+                }
+
+                fetch("{{ route('penanggung_jawab.store') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                        },
+                        body: JSON.stringify({
+                            nama: nama
+                        })
+                    })
+                    .then(async res => {
+                        if (res.ok) return res.json();
+                        const payload = await res.json().catch(() => ({}));
+                        throw payload;
+                    })
+                    .then(data => {
+                        // close modal and refresh select
+                        const modalEl = document.getElementById('modalPenanggungJawab');
+                        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                        modal.hide();
+                        inputNama.value = '';
+                        refreshPenanggungJawabOptions(data.id);
+                    })
+                    .catch(err => {
+                        const msg = err?.message || (err?.errors?.nama?.[0]) ||
+                            'Gagal menyimpan penanggung jawab';
+                        inputNama.classList.add('is-invalid');
+                        errorNama.textContent = msg;
+                        errorNama.style.display = 'block';
+                    });
+            });
+
+            // initial populate if server didn't pass options
+            if (!penanggungJawabSelect.querySelector('option[value]:not([value=""])')) {
+                refreshPenanggungJawabOptions();
+            }
+        })();
     </script>
 @endpush

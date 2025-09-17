@@ -34,23 +34,27 @@
                                     @enderror
                                 </div>
                                 <div class="mb-3">
+                                    <label for="uniq" class="form-label">Kode<span style="color: red;">*</span></label>
+                                    <input type="text" class="form-control @error('uniq') is-invalid @enderror"
+                                        id="uniq" name="uniq" value="{{ old('uniq', $data_botol->uniq) }}" required>
+                                    @error('uniq')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="mb-3">
                                     <label for="jenis_botol" class="form-label">Jenis Botol<span
                                             style="color: red;">*</span></label>
                                     <select class="form-control @error('jenis_botol') is-invalid @enderror" id="jenis_botol"
                                         name="jenis_botol" required>
-                                        <option value="">Pilih Jenis Botol</option>
-                                        <option value="acitilin"
-                                            {{ old('jenis_botol', $data_botol->jenis_botol) == 'acitilin' ? 'selected' : '' }}>
-                                            Acitilin
+                                        <option value="{{ $data_botol->jenis_botol }}">{{ $data_botol->jenis_botol }}
                                         </option>
-                                        <option value="oxygen 1m³"
-                                            {{ old('jenis_botol', $data_botol->jenis_botol) == 'oxygen 1m³' ? 'selected' : '' }}>
-                                            oxygen 1m³
-                                        </option>
-                                        <option value="oxygen 6"
-                                            {{ old('jenis_botol', $data_botol->jenis_botol) == 'oxygen 6' ? 'selected' : '' }}>
-                                            oxygen 6
-                                        </option>
+                                        @foreach ($jenis as $item)
+                                            <option value="{{ $item->nama_jenis }}"
+                                                {{ old('jenis_botol') == $item->nama_jenis ? 'selected' : '' }}>
+                                                {{ $item->nama_jenis }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                     @error('jenis_botol')
                                         <div class="invalid-feedback">{{ $message }}</div>

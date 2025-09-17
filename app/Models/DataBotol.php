@@ -10,6 +10,7 @@ class DataBotol extends Model
 
     protected $fillable = [
         'nomor_botol',
+        'uniq',
         'jenis_botol',
         'status_pinjaman',
         'status_isi'

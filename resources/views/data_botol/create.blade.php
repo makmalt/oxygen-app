@@ -19,6 +19,8 @@
                 <div class="card-body">
                     <form action="{{ route('data_botol.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
+                        <input type="hidden" name="status_isi" value="isi">
+                        <input type="hidden" name="status_pinjaman" value="0">
                         <div class="row">
                             <div class="col-md-8">
                                 <div class="mb-3">

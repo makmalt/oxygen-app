@@ -42,8 +42,12 @@ class DataBotolController extends Controller
 
     public function edit($id)
     {
+        $jenis = JenisBotol::orderBy('nama_jenis')->get(['id', 'nama_jenis']);
         $data_botol = DataBotol::find($id);
-        return view('data_botol.edit', compact('data_botol'));
+        return view('data_botol.edit', [
+            'data_botol' => $data_botol,
+            'jenis' => $jenis
+        ]);
     }
 
     public function update(Request $request, $id)

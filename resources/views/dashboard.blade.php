@@ -74,6 +74,40 @@
                 </table>
             </div>
         </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>Daftar Botol Masuk Pabrik</h5>
+            </div>
+            <div class="card-body">
+                <table class="table" id="botol-kosong">
+                    <thead>
+                        <tr>
+                            <th>
+                                Nomor Botol
+                            </th>
+                            <th>
+                                Status
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($botolMasukPabrik as $botol)
+                            <tr>
+                                <td>{{ $botol->nomor_botol }}</td>
+                                <td>
+                                    @if (strtolower($botol->status_isi) === 'masuk pabrik')
+                                        <span class="badge bg-warning text-warn text-dark">{{ $botol->status_isi }}</span>
+                                    @else
+                                        <span class="badge bg-secondary">{{ $botol->status_isi }}</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
     @endsection
 
     @push('scripts')

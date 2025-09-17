@@ -36,6 +36,7 @@
                                     <th>Kode</th>
                                     <th>Status Pinjaman</th>
                                     <th>Jenis Botol</th>
+                                    <th>Status</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -53,6 +54,7 @@
                                             @endif
                                         </td>
                                         <td>{{ $data_botol->jenis_botol }}</td>
+                                        <td>{{ $data_botol->status_isi }}</td>
                                         <td>
                                             <a href="{{ route('data_botol.show', $data_botol->id) }}"
                                                 class="btn btn-info btn-sm">
@@ -61,10 +63,15 @@
                                             <a href="{{ route('data_botol.edit', $data_botol->id) }}"
                                                 class="btn btn-warning btn-sm">Edit
                                             </a>
-                                            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#perbaruiStatusModal{{ $data_botol->id }}">
-                                                <i class="bx bx-refresh"></i> Perbarui
-                                            </button>
+                                            <form action="{{ route('data_botol.destroy', $data_botol->id) }}"
+                                                method="POST" style="display:inline-block"
+                                                onsubmit="return confirm('Hapus botol ini?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                    <i class="bx bx-trash me-1"></i> Hapus
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                 @empty

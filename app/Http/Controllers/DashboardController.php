@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\DataBotol;
 use Illuminate\Support\Facades\DB;
 
@@ -25,11 +24,13 @@ class DashboardController extends Controller
                     ->where('d.status_kirim', 1);
             })
             ->get();
+        $botolMasukPabrik = DataBotol::where('status_isi', 'masuk pabrik')->get();
         return view('dashboard', [
             'totalBotol' => $totalBotol,
             'totalBotolKosong' => $totalBotolKosong,
             'totalBotolIsi' => $totalBotolIsi,
             'botolKosongs' => $botolKosongs,
+            'botolMasukPabrik' => $botolMasukPabrik,
         ]);
     }
     //

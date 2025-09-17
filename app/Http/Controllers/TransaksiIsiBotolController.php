@@ -84,9 +84,12 @@ class TransaksiIsiBotolController extends Controller
 
     public function create()
     {
-        $botols = DataBotol::orderBy('nomor_botol')->get(['id', 'nomor_botol', 'status_isi']);
+        $botolCount = DataBotol::count();
+        $botols = $botolCount > 10
+            ? collect()
+            : DataBotol::orderBy('nomor_botol')->get(['id', 'nomor_botol', 'status_isi']);
         $suppliers = DataSupplier::orderBy('nama_supplier')->get(['id', 'nama_supplier']);
-        return view('transaksi_isi_botol.create', compact('botols', 'suppliers'));
+        return view('transaksi_isi_botol.create', compact('botols', 'suppliers', 'botolCount'));
     }
 
     public function store(Request $request)
@@ -150,5 +153,41 @@ class TransaksiIsiBotolController extends Controller
 
         return redirect()->route('transaksi_isi_botol.crosscheck', $transaksi->id)
             ->with('success', 'Crosscheck penerimaan diperbarui.');
+    }
+
+    public function botols(Request $request): JsonResponse
+    {
+        $page = max(1, (int) $request->input('page', 1));
+        $perPage = min(50, max(5, (int) $request->input('per_page', 20)));
+        $q = trim((string) $request->input('q', ''));
+
+        $query = DataBotol::query()->orderBy('nomor_botol');
+        if ($q !== '') {
+            $query->where(function ($sub) use ($q) {
+                $sub->where('nomor_botol', 'like', "%$q%")
+                    ->orWhere('status_isi', 'like', "%$q%");
+            });
+        }
+
+        $total = (clone $query)->count();
+        $items = $query->skip(($page - 1) * $perPage)->take($perPage)
+            ->get(['id', 'nomor_botol', 'status_isi'])
+            ->map(function ($b) {
+                return [
+                    'id' => $b->id,
+                    'nomor_botol' => $b->nomor_botol,
+                    'status_isi' => (string) $b->status_isi,
+                ];
+            })->all();
+
+        $hasMore = ($page * $perPage) < $total;
+
+        return response()->json([
+            'data' => $items,
+            'page' => $page,
+            'per_page' => $perPage,
+            'total' => $total,
+            'has_more' => $hasMore,
+        ]);
     }
 }
