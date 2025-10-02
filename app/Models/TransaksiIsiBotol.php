@@ -16,6 +16,10 @@ class TransaksiIsiBotol extends Model
         'tanggal_isi',
     ];
 
+    protected $casts = [
+        'tanggal_isi' => 'date',
+    ];
+
     public function details()
     {
         return $this->hasMany(DetailTransaksiIsiBotol::class, 'transaksi_id');

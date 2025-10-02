@@ -24,7 +24,9 @@ class DashboardController extends Controller
                     ->where('d.status_kirim', 1);
             })
             ->get();
-        $botolMasukPabrik = DataBotol::where('status_isi', 'masuk pabrik')->get();
+        $botolMasukPabrik = DataBotol::where('status_isi', 'masuk pabrik')
+            ->with('details.transaksi') // ini sekarang valid
+            ->get();
         return view('dashboard', [
             'totalBotol' => $totalBotol,
             'totalBotolKosong' => $totalBotolKosong,

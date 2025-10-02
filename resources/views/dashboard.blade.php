@@ -68,6 +68,7 @@
                                         <span class="badge bg-success">Kembali</span>
                                     @endif
                                 </td>
+
                             </tr>
                         @endforeach
                     </tbody>
@@ -89,6 +90,9 @@
                             <th>
                                 Status
                             </th>
+                            <th>
+                                Tanggal Dikirim
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -101,6 +105,8 @@
                                     @else
                                         <span class="badge bg-secondary">{{ $botol->status_isi }}</span>
                                     @endif
+                                </td>
+                                <td>{{ \Carbon\Carbon::parse($botol->details?->transaksi?->tanggal_isi)->format('d-m-Y') }}
                                 </td>
                             </tr>
                         @endforeach

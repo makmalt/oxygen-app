@@ -28,5 +28,10 @@ class DataBotol extends Model
             ->whereNull('tanggal_pengembalian');
     }
 
+    public function details()
+    {
+        return $this->hasOne(DetailTransaksiIsiBotol::class, 'botol_id')->latestOfMany('id');
+    }
+
     public $timestamps = true;
 }
