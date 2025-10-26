@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DataBotol;
 use Illuminate\Support\Facades\DB;
+use App\Models\ActivitiesModel;
 
 class DashboardController extends Controller
 {
@@ -27,12 +28,14 @@ class DashboardController extends Controller
         $botolMasukPabrik = DataBotol::where('status_isi', 'masuk pabrik')
             ->with('details.transaksi') // ini sekarang valid
             ->get();
+        $activities = ActivitiesModel::all();
         return view('dashboard', [
             'totalBotol' => $totalBotol,
             'totalBotolKosong' => $totalBotolKosong,
             'totalBotolIsi' => $totalBotolIsi,
             'botolKosongs' => $botolKosongs,
             'botolMasukPabrik' => $botolMasukPabrik,
+            'activities' => $activities,
         ]);
     }
     //

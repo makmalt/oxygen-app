@@ -114,12 +114,53 @@
                 </table>
             </div>
         </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>Daftar Botol Masuk Pabrik</h5>
+            </div>
+            <div class="card-body">
+                <table class="table" id="activities-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                Aktivitas
+                            </th>
+                            <th>
+                                Nomor Botol
+                            </th>
+                            <th>
+                                Deskripsi
+                            </th>
+                            <th>
+                                Tanggal
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($activities as $activity)
+                            <tr>
+                                <td>{{ $activity->activityName }}</td>
+                                <td>{{ $activity->no_botol }}</td>
+                                <td>{{ $activity->description }}</td>
+                                <td>{{ \Carbon\Carbon::parse($activity->created_at)->format('d/m/y') }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
     @endsection
 
     @push('scripts')
         <script>
             $(document).ready(function() {
                 $('#botol-kosong').DataTable({
+                    language: {
+                        url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/id.json'
+                    }
+                });
+                $('#activities-table').DataTable({
                     language: {
                         url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/id.json'
                     }
