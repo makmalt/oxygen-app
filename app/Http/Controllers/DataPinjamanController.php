@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper\ActivitiesHelper;
 use App\Models\DataBotol;
 use App\Models\DataPinjaman;
 use App\Models\PenanggungJawab;
@@ -102,7 +103,6 @@ class DataPinjamanController extends Controller
     }
     public function store(Request $request)
     {
-        // Validasi input utama + field opsional untuk botol sebelumnya
         $validated = $request->validate([
             'nomor_botol' => 'required|exists:data_botol,id',
             'nama_pelanggan' => 'required|exists:data_pelanggan,id',
@@ -113,8 +113,7 @@ class DataPinjamanController extends Controller
         ]);
 
         DB::transaction(function () use ($validated) {
-            // Jika user memilih botol sebelumnya dan mengisi tanggal_pengembalian,
-            // arahkan tanggal_pengembalian ke pinjaman aktif botol sebelumnya
+            // Tutup pinjaman sebelumnya jika ada
             if (!empty($validated['nomor_botol_sebelumnya']) && !empty($validated['tanggal_pengembalian'])) {
                 $pinjamanSebelumnya = DataPinjaman::where('nomor_botol', $validated['nomor_botol_sebelumnya'])
                     ->whereNull('tanggal_pengembalian')
@@ -127,7 +126,7 @@ class DataPinjamanController extends Controller
                 }
             }
 
-            // Buat pinjaman baru untuk botol saat ini tanpa tanggal_pengembalian (masih dipinjam)
+            // Buat pinjaman baru
             $pinjamanBaru = DataPinjaman::create([
                 'nomor_botol' => $validated['nomor_botol'],
                 'nama_pelanggan' => $validated['nama_pelanggan'],
@@ -136,16 +135,29 @@ class DataPinjamanController extends Controller
                 'penanggung_jawab_id' => $validated['penanggung_jawab_id'] ?? null,
             ]);
 
-            // Atur status_isi botol menjadi 'kosong' saat mulai dipinjam
+            // Update status botol jadi kosong
             $botol = DataBotol::find($validated['nomor_botol']);
             if ($botol) {
                 $botol->status_isi = 'kosong';
                 $botol->save();
             }
+
+            // Ambil nama pelanggan dari model DataPelanggan
+            $pelanggan = DataPelanggan::find($validated['nama_pelanggan']);
+            $namaPelanggan = $pelanggan?->nama ?? 'Pelanggan Tidak Diketahui';
+
+            // Catat aktivitas
+            ActivitiesHelper::activities(
+                'Tambah data pinjaman',
+                $botol?->nomor_botol,
+                'Botol dengan nomor ' . ($botol?->nomor_botol ?? '-') . ' telah dipinjam oleh ' . $namaPelanggan
+            );
         });
 
         return redirect()->route('data_pinjaman.index');
     }
+
+
     public function edit($id)
     {
         $data_pinjaman = DataPinjaman::find($id);
@@ -178,6 +190,12 @@ class DataPinjamanController extends Controller
         $dataPinjaman = DataPinjaman::findOrFail($id);
         $dataPinjaman->tanggal_pengembalian = $request->tanggal_pengembalian;
         $dataPinjaman->save();
+        ActivitiesHelper::activities(
+            'Pengembalian pinjaman botol',
+            optional($dataPinjaman->botol)->nomor_botol,
+            'Botol dengan nomor ' . optional($dataPinjaman->botol)->nomor_botol .
+                ' telah dikembalikan pada ' . ($request->tanggal_pengembalian ?? 'null')
+        );
 
         return redirect()->back()->with('success', 'Tanggal pengembalian berhasil diperbarui.');
     }

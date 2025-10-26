@@ -9,6 +9,7 @@ use App\Models\DataSupplier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Helper\ActivitiesHelper;
 
 class TransaksiIsiBotolController extends Controller
 {
@@ -120,6 +121,18 @@ class TransaksiIsiBotolController extends Controller
             return $trx;
         });
 
+        // Loop tiap botol untuk buat log satu per satu
+        foreach ($validated['botol_ids'] as $botolId) {
+            $botol = DataBotol::find($botolId);
+
+            ActivitiesHelper::activities(
+                'Transaksi isi botol dikirim ke pabrik',
+                $botol->nomor_botol,
+                'Botol dengan nomor ' . $botol->nomor_botol . ' dikirim ke pabrik'
+            );
+        }
+
+
         return redirect()->route('transaksi_isi_botol.crosscheck', $transaksi->id)
             ->with('success', 'Transaksi pengiriman dibuat. Lakukan crosscheck saat menerima.');
     }
@@ -132,7 +145,8 @@ class TransaksiIsiBotolController extends Controller
 
     public function crosscheckStore(Request $request, int $id)
     {
-        $transaksi = TransaksiIsiBotol::with(['details'])->findOrFail($id);
+        $transaksi = TransaksiIsiBotol::with(['details.botol'])->findOrFail($id);
+
         $validated = $request->validate([
             'received_ids' => 'nullable|array',
             'received_ids.*' => 'required|exists:detail_transaksi_isi_botol,id',
@@ -146,7 +160,18 @@ class TransaksiIsiBotolController extends Controller
                     // diterima kembali dari pabrik: status_kirim=1 dan status_isi botol = 'terisi'
                     $detail->status_kirim = 1;
                     $detail->save();
-                    $detail->botol?->update(['status_isi' => 'isi']);
+
+                    if ($detail->botol) {
+                        $detail->botol->update(['status_isi' => 'isi']);
+
+                        // log aktivitas untuk botol ini
+                        ActivitiesHelper::activities(
+                            'Crosscheck pengisian botol',
+                            $detail->botol->nomor_botol,
+                            'Botol dengan nomor ' . $detail->botol->nomor_botol .
+                                ' telah diterima kembali dan status diubah menjadi terisi ' 
+                        );
+                    }
                 }
             }
         });
@@ -154,6 +179,7 @@ class TransaksiIsiBotolController extends Controller
         return redirect()->route('transaksi_isi_botol.crosscheck', $transaksi->id)
             ->with('success', 'Crosscheck penerimaan diperbarui.');
     }
+
 
     public function botols(Request $request): JsonResponse
     {

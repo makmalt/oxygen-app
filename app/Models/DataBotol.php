@@ -33,5 +33,10 @@ class DataBotol extends Model
         return $this->hasOne(DetailTransaksiIsiBotol::class, 'botol_id')->latestOfMany('id');
     }
 
+    function activities()
+    {
+        return $this->hasMany(ActivitiesModel::class, 'no_botol', 'nomor_botol');
+    }
+
     public $timestamps = true;
 }

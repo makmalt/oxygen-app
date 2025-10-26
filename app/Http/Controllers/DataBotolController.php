@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\DataBotol;
 use App\Models\DataPinjaman;
 use App\Models\JenisBotol;
+use App\Helper\ActivitiesHelper;
 
 class DataBotolController extends Controller
 {
@@ -36,7 +37,19 @@ class DataBotolController extends Controller
 
     public function store(Request $request)
     {
-        DataBotol::create($request->all());
+        $validatedData = $request->validate([
+            'nomor_botol' => 'required|unique:data_botol,nomor_botol',
+            'jenis_botol' => 'required|exists:jenis_botol,nama_jenis',
+            'status_pinjaman' => 'required|in:0,1',
+        ]);
+
+        DataBotol::create($validatedData);
+        ActivitiesHelper::activities(
+            'Menambahkan data botol',
+            $request->nomor_botol,
+            'Data botol dengan nomor ' . $request->nomor_botol . ' telah ditambahkan.'
+        );
+
         return redirect()->route('data_botol.index');
     }
 
@@ -44,6 +57,7 @@ class DataBotolController extends Controller
     {
         $jenis = JenisBotol::orderBy('nama_jenis')->get(['id', 'nama_jenis']);
         $data_botol = DataBotol::find($id);
+
         return view('data_botol.edit', [
             'data_botol' => $data_botol,
             'jenis' => $jenis
@@ -54,6 +68,12 @@ class DataBotolController extends Controller
     {
         $data_botol = DataBotol::find($id);
         $data_botol->update($request->all());
+        ActivitiesHelper::activities(
+            'Memperbarui data botol',
+            $data_botol->nomor_botol,
+            'Data botol dengan nomor ' . $data_botol->nomor_botol . ' telah diperbarui.'
+        );
+
         return redirect()->route('data_botol.index');
     }
 

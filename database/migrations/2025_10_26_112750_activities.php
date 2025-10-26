@@ -11,8 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('data_botol', function (Blueprint $table) {
-            $table->string('jenis_botol', 50)->nullable()->change();
+        //
+        Schema::create('activities', function (Blueprint $table) {
+            $table->id();
+            $table->string('activityName')->nullable();
+            $table->string('no_botol')->nullable();
+            $table->text('description')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -21,8 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('data_botol', function (Blueprint $table) {
-            //
-        });
+        //
     }
 };
