@@ -41,6 +41,10 @@
                                                 class="btn btn-info btn-sm">
                                                 <i class="bx bx-detail me-1"></i> Detail
                                             </a>
+                                            <a href="{{ route('data_pelanggan.edit', $data_pelanggan->id) }}"
+                                                class="btn btn-warning btn-sm">
+                                                <i class="bx bx-edit me-1"></i> Edit
+                                            </a>
                                             <form action="{{ route('data_pelanggan.destroy', $data_pelanggan->id) }}"
                                                 method="POST" style="display:inline-block"
                                                 onsubmit="return confirm('Hapus pelanggan ini?');">

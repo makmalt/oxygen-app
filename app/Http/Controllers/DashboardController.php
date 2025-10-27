@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DataBotol;
 use Illuminate\Support\Facades\DB;
 use App\Models\ActivitiesModel;
+use Yajra\DataTables\Facades\DataTables;
 
 class DashboardController extends Controller
 {
@@ -37,6 +38,19 @@ class DashboardController extends Controller
             'botolMasukPabrik' => $botolMasukPabrik,
             'activities' => $activities,
         ]);
+    }
+
+    public function data()
+    {
+        $query = ActivitiesModel::query();
+
+
+        return DataTables::of($query)
+            ->addIndexColumn()
+            ->editColumn('created_at', function ($item) {
+                return $item->created_at->format('d/m/y');
+            })
+            ->make(true);
     }
     //
 }

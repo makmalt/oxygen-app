@@ -24,6 +24,8 @@ Route::get('/data_pinjaman/data', [DataPinjamanController::class, 'data'])->name
 Route::resource('data_pinjaman', DataPinjamanController::class);
 Route::get('/data_pinjaman/data', [DataPinjamanController::class, 'data'])->name('data_pinjaman.data');
 
+//get data aktivitas
+Route::get('/dashboard/data', [DashboardController::class, 'data'])->name('dashboard.data');
 
 Route::put('/data_botol/update-status/{id}', [DataBotolController::class, 'updateStatus'])->name('data_botol.updateStatus');
 

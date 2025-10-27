@@ -124,6 +124,9 @@
                     <thead>
                         <tr>
                             <th>
+                                No
+                            </th>
+                            <th>
                                 Aktivitas
                             </th>
                             <th>
@@ -137,16 +140,6 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach ($activities as $activity)
-                            <tr>
-                                <td>{{ $activity->activityName }}</td>
-                                <td>{{ $activity->no_botol }}</td>
-                                <td>{{ $activity->description }}</td>
-                                <td>{{ \Carbon\Carbon::parse($activity->created_at)->format('d/m/y') }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
                 </table>
             </div>
         </div>
@@ -161,9 +154,33 @@
                     }
                 });
                 $('#activities-table').DataTable({
-                    language: {
-                        url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/id.json'
-                    }
+                    processing: true,
+                    serverSide: true,
+                    ajax: '{{ route('dashboard.data') }}',
+                    columns: [{
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex'
+                        },
+                        {
+                            data: 'activityName',
+                            name: 'activityName'
+                        },
+                        {
+                            data: 'no_botol',
+                            name: 'no_botol'
+                        },
+                        {
+                            data: 'description',
+                            name: 'description'
+                        },
+                        {
+                            data: 'created_at',
+                            name: 'created_at'
+                        },
+                    ],
+                    order: [
+                        [4, 'desc']
+                    ],
                 });
             });
         </script>
