@@ -59,7 +59,8 @@
                                             @foreach ($botols as $botol)
                                                 @php($si = strtolower((string) $botol->status_isi))
                                                 <div class="form-check botol-row" data-status="{{ $si }}"
-                                                    data-nomor="{{ $botol->nomor_botol }}">
+                                                    data-nomor="{{ $botol->nomor_botol }}"
+                                                    data-botol-id="{{ $botol->id }}">
                                                     <input class="form-check-input botol-checkbox" type="checkbox"
                                                         name="botol_ids[]" value="{{ $botol->id }}"
                                                         id="b{{ $botol->id }}"
@@ -87,6 +88,14 @@
                                         <div class="text-danger small mt-1">{{ $message }}</div>
                                     @enderror
                                 </div>
+
+                                <!-- Daftar botol yang dipilih -->
+                                <div id="selected_botols_wrapper" style="display: none;">
+                                    <label class="form-label">Botol Terpilih (<span id="selected_count">0</span>)</label>
+                                    <div class="border rounded p-2 bg-light" style="max-height: 150px; overflow-y: auto;">
+                                        <div id="selected_botols_list"></div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-12">
                                 <a href="{{ route('dashboard') }}" class="btn btn-secondary">Batal</a>
@@ -105,15 +114,16 @@
         (function() {
             const container = document.querySelector('#botol_list');
             const toastId = 'toastMasukPabrik';
+            const selectedBotols = new Set(); // Menyimpan ID botol yang dipilih
+            const botolData = new Map(); // Menyimpan data botol (id -> {nomor, status})
 
             function ensureToast() {
                 let toastEl = document.getElementById(toastId);
                 if (!toastEl) {
                     const wrapper = document.createElement('div');
                     wrapper.className = 'toast-container position-fixed top-0 end-0 p-3';
-                    // Pastikan tidak tertutup navbar
                     wrapper.style.zIndex = '2000';
-                    wrapper.style.top = '72px'; // offset di bawah navbar
+                    wrapper.style.top = '72px';
                     wrapper.innerHTML = `
                         <div id="${toastId}" class="toast align-items-center text-bg-warning border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="2000">
                             <div class="d-flex">
@@ -127,7 +137,71 @@
                 return bootstrap.Toast.getOrCreateInstance(toastEl);
             }
 
+            // Fungsi untuk update tampilan botol terpilih
+            function updateSelectedDisplay() {
+                const wrapper = document.getElementById('selected_botols_wrapper');
+                const list = document.getElementById('selected_botols_list');
+                const countEl = document.getElementById('selected_count');
+
+                countEl.textContent = selectedBotols.size;
+
+                if (selectedBotols.size === 0) {
+                    wrapper.style.display = 'none';
+                    return;
+                }
+
+                wrapper.style.display = 'block';
+                list.innerHTML = '';
+
+                selectedBotols.forEach(id => {
+                    const data = botolData.get(id);
+                    if (!data) return;
+
+                    const item = document.createElement('div');
+                    item.className = 'd-flex justify-content-between align-items-center mb-1 p-1';
+                    item.innerHTML = `
+                        <span class="small">${data.nomor}
+                            ${data.status === 'terisi' ? '<span class="badge bg-success">Terisi</span>' :
+                              data.status === 'kosong' ? '<span class="badge bg-warning">Kosong</span>' :
+                              '<span class="badge bg-secondary">Isi</span>'}
+                        </span>
+                        <button type="button" class="btn btn-sm btn-outline-danger py-0 px-1" onclick="unselectBotol('${id}')">
+                            <i class="bx bx-x"></i>
+                        </button>
+                    `;
+                    list.appendChild(item);
+                });
+            }
+
+            // Fungsi untuk unselect botol
+            window.unselectBotol = function(id) {
+                selectedBotols.delete(id);
+                const checkbox = document.getElementById('b' + id);
+                if (checkbox) checkbox.checked = false;
+                updateSelectedDisplay();
+            };
+
+            // Handler untuk checkbox
+            function handleCheckboxChange(checkbox) {
+                const id = checkbox.value;
+                const row = checkbox.closest('.botol-row');
+
+                if (checkbox.checked) {
+                    selectedBotols.add(id);
+                    if (!botolData.has(id)) {
+                        botolData.set(id, {
+                            nomor: row.getAttribute('data-nomor'),
+                            status: row.getAttribute('data-status')
+                        });
+                    }
+                } else {
+                    selectedBotols.delete(id);
+                }
+                updateSelectedDisplay();
+            }
+
             if (container) {
+                // Event listener untuk klik pada row
                 container.addEventListener('click', function(e) {
                     const row = e.target.closest('.botol-row');
                     if (!row) return;
@@ -140,9 +214,16 @@
                         ensureToast().show();
                     }
                 }, true);
+
+                // Event listener untuk perubahan checkbox
+                container.addEventListener('change', function(e) {
+                    if (e.target.classList.contains('botol-checkbox')) {
+                        handleCheckboxChange(e.target);
+                    }
+                });
             }
 
-            // Search + infinite scroll (server-side when banyak data)
+            // Search + infinite scroll
             (function() {
                 const searchInput = document.getElementById('search_botol');
                 const total = parseInt('{{ $botolCount ?? 0 }}', 10) || 0;
@@ -159,13 +240,26 @@
                         wrap.className = 'form-check botol-row';
                         wrap.setAttribute('data-status', status);
                         wrap.setAttribute('data-nomor', item.nomor_botol);
+                        wrap.setAttribute('data-botol-id', item.id);
+
+                        // Cek apakah botol ini sudah dipilih
+                        const isChecked = selectedBotols.has(item.id.toString());
+
                         wrap.innerHTML = `
-<input class="form-check-input botol-checkbox" type="checkbox" name="botol_ids[]" value="${item.id}" id="b${item.id}" ${status === 'masuk pabrik' ? 'disabled' : ''}>
+<input class="form-check-input botol-checkbox" type="checkbox" name="botol_ids[]" value="${item.id}" id="b${item.id}" ${status === 'masuk pabrik' ? 'disabled' : ''} ${isChecked ? 'checked' : ''}>
 <label class="form-check-label" for="b${item.id}" title="${status === 'masuk pabrik' ? 'Sedang di pabrik - tidak dapat dipilih' : ''}">
     ${item.nomor_botol}
     ${status === 'terisi' ? '<span class="badge bg-success">Terisi</span>' : status === 'kosong' ? '<span class="badge bg-warning">Kosong</span>' : status === 'masuk pabrik' ? '<span class="badge bg-info">Masuk Pabrik</span>' : '<span class="badge bg-secondary">Isi</span>'}
 </label>`;
                         frag.appendChild(wrap);
+
+                        // Simpan data botol
+                        if (!botolData.has(item.id.toString())) {
+                            botolData.set(item.id.toString(), {
+                                nomor: item.nomor_botol,
+                                status: status
+                            });
+                        }
                     });
                     if (!append) container.innerHTML = '';
                     container.appendChild(frag);
@@ -200,21 +294,41 @@
                 }
 
                 if (useServer) {
-                    // initial load
+                    // Initial load - simpan data awal ke botolData
+                    const initialRows = container.querySelectorAll('.botol-row');
+                    initialRows.forEach(row => {
+                        const id = row.getAttribute('data-botol-id');
+                        if (id) {
+                            botolData.set(id, {
+                                nomor: row.getAttribute('data-nomor'),
+                                status: row.getAttribute('data-status')
+                            });
+                        }
+                    });
+
                     fetchServer(true);
-                    // scroll handler
                     container?.addEventListener('scroll', function() {
                         if (!hasMore || loading) return;
                         const nearBottom = container.scrollTop + container.clientHeight >= container
                             .scrollHeight - 24;
                         if (nearBottom) fetchServer();
                     });
-                    // search handler
                     searchInput?.addEventListener('input', function() {
                         fetchServer(true);
                     });
                 } else {
-                    // client-side filter for small dataset
+                    // Client-side filter - simpan data awal
+                    const initialRows = container.querySelectorAll('.botol-row');
+                    initialRows.forEach(row => {
+                        const id = row.getAttribute('data-botol-id');
+                        if (id) {
+                            botolData.set(id, {
+                                nomor: row.getAttribute('data-nomor'),
+                                status: row.getAttribute('data-status')
+                            });
+                        }
+                    });
+
                     if (searchInput) {
                         function filterRows() {
                             const q = (searchInput.value || '').toLowerCase().trim();

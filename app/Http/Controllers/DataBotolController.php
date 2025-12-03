@@ -40,6 +40,7 @@ class DataBotolController extends Controller
         $validatedData = $request->validate([
             'nomor_botol' => 'required|unique:data_botol,nomor_botol',
             'jenis_botol' => 'required|exists:jenis_botol,nama_jenis',
+            'uniq' => 'required|unique:data_botol,uniq',
             'status_pinjaman' => 'required|in:0,1',
         ]);
 
