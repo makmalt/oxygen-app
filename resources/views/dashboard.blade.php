@@ -7,10 +7,11 @@
     }
 </style>
 
-
 @section('content')
     <div class="container-fluid">
         <h2 class="mb-4">Dashboard</h2>
+
+        {{-- Summary --}}
         <div class="row mb-4">
             <div class="col-md-4">
                 <div class="card p-3">
@@ -31,23 +32,19 @@
                 </div>
             </div>
         </div>
+
+        {{-- Botol Kosong --}}
         <div class="card">
             <div class="card-header">
                 <h5>Daftar Botol Kosong</h5>
             </div>
             <div class="card-body">
-                <table class="table" id="botol-kosong">
+                <table class="table" id="table-botol-kosong">
                     <thead>
                         <tr>
-                            <th>
-                                Nomor Botol
-                            </th>
-                            <th>
-                                Status Isi
-                            </th>
-                            <th>
-                                Status Pinjaman
-                            </th>
+                            <th>Nomor Botol</th>
+                            <th>Status Isi</th>
+                            <th>Status Pinjaman</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -68,7 +65,6 @@
                                         <span class="badge bg-success">Kembali</span>
                                     @endif
                                 </td>
-
                             </tr>
                         @endforeach
                     </tbody>
@@ -76,23 +72,18 @@
             </div>
         </div>
 
+        {{-- Botol Masuk Pabrik --}}
         <div class="card mt-4">
             <div class="card-header">
                 <h5>Daftar Botol Masuk Pabrik</h5>
             </div>
             <div class="card-body">
-                <table class="table" id="botol-kosong">
+                <table class="table" id="table-botol-pabrik">
                     <thead>
                         <tr>
-                            <th>
-                                Nomor Botol
-                            </th>
-                            <th>
-                                Status
-                            </th>
-                            <th>
-                                Tanggal Dikirim
-                            </th>
+                            <th>Nomor Botol</th>
+                            <th>Status</th>
+                            <th>Tanggal Dikirim</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -101,12 +92,15 @@
                                 <td>{{ $botol->nomor_botol }}</td>
                                 <td>
                                     @if (strtolower($botol->status_isi) === 'masuk pabrik')
-                                        <span class="badge bg-warning text-warn text-dark">{{ $botol->status_isi }}</span>
+                                        <span class="badge bg-warning text-dark">{{ $botol->status_isi }}</span>
                                     @else
                                         <span class="badge bg-secondary">{{ $botol->status_isi }}</span>
                                     @endif
                                 </td>
-                                <td>{{ \Carbon\Carbon::parse($botol->details?->transaksi?->tanggal_isi)->format('d-m-Y') }}
+                                <td>
+                                    {{ optional($botol->details?->transaksi)->tanggal_isi
+                                        ? \Carbon\Carbon::parse($botol->details->transaksi->tanggal_isi)->format('d-m-Y')
+                                        : '-' }}
                                 </td>
                             </tr>
                         @endforeach
@@ -115,29 +109,20 @@
             </div>
         </div>
 
+        {{-- Aktivitas --}}
         <div class="card mt-4">
             <div class="card-header">
-                <h5>Daftar Botol Masuk Pabrik</h5>
+                <h5>Daftar Aktivitas Botol</h5>
             </div>
             <div class="card-body">
                 <table class="table" id="activities-table">
                     <thead>
                         <tr>
-                            <th>
-                                No
-                            </th>
-                            <th>
-                                Aktivitas
-                            </th>
-                            <th>
-                                Nomor Botol
-                            </th>
-                            <th>
-                                Deskripsi
-                            </th>
-                            <th>
-                                Tanggal
-                            </th>
+                            <th>No</th>
+                            <th>Aktivitas</th>
+                            <th>Nomor Botol</th>
+                            <th>Deskripsi</th>
+                            <th>Tanggal</th>
                         </tr>
                     </thead>
                 </table>
@@ -148,11 +133,18 @@
     @push('scripts')
         <script>
             $(document).ready(function() {
-                $('#botol-kosong').DataTable({
+                $('#table-botol-kosong').DataTable({
                     language: {
                         url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/id.json'
                     }
                 });
+
+                $('#table-botol-pabrik').DataTable({
+                    language: {
+                        url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/id.json'
+                    }
+                });
+
                 $('#activities-table').DataTable({
                     processing: true,
                     serverSide: true,
@@ -180,7 +172,7 @@
                     ],
                     order: [
                         [4, 'desc']
-                    ],
+                    ]
                 });
             });
         </script>
