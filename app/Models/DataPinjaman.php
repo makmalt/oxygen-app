@@ -48,5 +48,11 @@ class DataPinjaman extends Model
                 $pinjaman->botol()->update(['status_pinjaman' => 0]);
             }
         });
+
+        // Event saat delete data pinjaman
+        static::deleting(function ($pinjaman) {
+            // Pastikan botol dikembalikan / tersedia
+            $pinjaman->botol()->update(['status_pinjaman' => 0]);
+        });
     }
 }

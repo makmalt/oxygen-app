@@ -70,8 +70,25 @@ class DataPinjamanController extends Controller
                 ? '<span class="badge bg-warning text-black">Dipinjam</span>'
                 : '<span class="badge bg-success">Sudah Kembali</span>';
             $detailUrl = route('data_pinjaman.show', $row->id);
-            $aksi = '<a href="' . e($detailUrl) . '" class="btn btn-info btn-sm me-1"><i class="bx bx-search"></i> Detail</a>'
-                . '<button type="button" class="btn btn-secondary btn-sm" data-action="open-update-status" data-id="' . $row->id . '"><i class="bx bx-refresh"></i> Perbarui</button>';
+            $aksi = '
+    <a href="' . e($detailUrl) . '" class="btn btn-info btn-sm me-1">
+        <i class="bx bx-search"></i> Detail
+    </a>
+
+    <button type="button" class="btn btn-secondary btn-sm me-1"
+            data-action="open-update-status" data-id="' . $row->id . '">
+        <i class="bx bx-refresh"></i> Perbarui
+    </button>
+
+    <form action="' . route('data_pinjaman.destroy', $row->id) . '" method="POST"
+          class="d-inline" onsubmit="return confirm(\'Yakin ingin menghapus data ini?\')">
+        ' . csrf_field() . method_field('DELETE') . '
+        <button type="submit" class="btn btn-danger btn-sm">
+            <i class="bx bx-trash"></i> Hapus
+        </button>
+    </form>
+';
+
             return [
                 '',
                 e($botol),
