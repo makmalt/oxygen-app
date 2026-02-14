@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('nomor_botol');
             $table->string('nama_pelanggan');
             $table->date('tanggal_pinjaman');
-            $table->string('penanggung_jawab');
+            $table->string('penanggung_jawab_id');
             $table->date('tanggal_pengembalian')->nullable();
             $table->timestamps();
         });

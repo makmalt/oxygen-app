@@ -16,6 +16,7 @@ return new class extends Migration
             $table->id();
             $table->string('nomor_botol');
             $table->string('status_pinjaman')->nullable();
+            $table->string('jenis_botol', 50)->nullable();
             $table->boolean('status_isi')->nullable();
             $table->timestamps();
         });

@@ -190,6 +190,12 @@ class DataPinjamanController extends Controller
     {
         $data_pinjaman = DataPinjaman::find($id);
         $data_pinjaman->delete();
+        // Catat aktivitas
+        ActivitiesHelper::activities(
+            'Hapus data pinjaman',
+            $data_pinjaman->botol?->nomor_botol,
+            'Botol dengan nomor ' . ($data_pinjaman->botol?->nomor_botol ?? '-') . ' telah telah dihapus '
+        );
         return redirect()->route('data_pinjaman.index');
     }
     public function show($id)
